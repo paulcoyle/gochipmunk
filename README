@@ -1,0 +1,5 @@
+For compatibility reasons, we are not using the Apple-specfic CGPoint for
+vectors.  When building the chipmunk library be sure to use the following
+when running cmake:
+
+    cmake -D CMAKE_C_FLAGS:STRING=-DCP_USE_CGPOINTS=0 .

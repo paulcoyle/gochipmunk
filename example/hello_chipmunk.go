@@ -29,7 +29,7 @@ func postStep(space *cp.Space, object interface{}) {
 // of these per categorical pair of collision types.  That is:
 //    (a,b) == (b,a)
 // where a and b are collision types.
-func beginCollide(space *cp.Space, a *cp.Shape, b *cp.Shape) int {
+func beginCollide(space *cp.Space, arb *cp.Arbiter) int {
   fmt.Println("BEGIN COLLISION")
   
   // Uncomment to add a post step callback to remove the ball

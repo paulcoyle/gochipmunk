@@ -38,6 +38,34 @@ func (b *Body) SetPosition(pos Vect) {
   C.cpBodySetPos(b.CPBody, pos.CPVect)
 }
 
+func (b *Body) GetAngle() float64 {
+  return float64(b.CPBody.a)
+}
+
+func (b *Body) SetAngle(angle float64) {
+  C.cpBodySetAngle(b.CPBody, C.cpFloat(angle))
+}
+
 func (b *Body) GetVelocity() Vect {
   return Vect{C.cpBodyGetVel(b.CPBody)}
+}
+
+func (b *Body) SetVelocityLimit(limit float64) {
+  b.CPBody.v_limit = C.cpFloat(limit)
+}
+
+func (b *Body) SetAngularRotation(omega float64) {
+  b.CPBody.w = C.cpFloat(omega)
+}
+
+func (b *Body) MultiplyAngularRotation(mult float64) {
+  b.CPBody.w *= C.cpFloat(mult)
+}
+
+func (b *Body) ApplyForce(force Vect, offset Vect) {
+  C.cpBodyApplyForce(b.CPBody, force.CPVect, offset.CPVect)
+}
+
+func (b *Body) ApplyImpulse(impulse Vect, offset Vect) {
+  C.cpBodyApplyImpulse(b.CPBody, impulse.CPVect, offset.CPVect)
 }

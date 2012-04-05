@@ -6,8 +6,12 @@ package cp
 #include <chipmunk/chipmunk.h>
 
 void cpgoSpaceAddPostStepCallback(cpSpace *space, void *object, void *data);
-cpBool cpgoGenericBeginHandler(cpArbiter *arb, cpSpace *space, void *data);
+cpBool cpgoGenericBeginAndPreHandler(cpArbiter *arb, cpSpace *space, void *data);
+void cpgoGenericPostAndSeparateHandler(cpArbiter *arb, cpSpace *space, void *data);
 void cpgoSpaceAddBeginCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b, void *data);
+void cpgoSpaceAddPreSolveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b, void *data);
+void cpgoSpaceAddPostSolveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b, void *data);
+void cpgoSpaceAddSeparateCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b, void *data);
 
 */
 import "C"
@@ -20,10 +24,13 @@ func c2goPostStepCallback(space *C.cpSpace, unused unsafe.Pointer, data unsafe.P
 }
 
 //export c2goCollisionHandler
-func c2goCollisionHandler(data unsafe.Pointer, a *C.cpShape, b *C.cpShape) int {
+func c2goCollisionHandler(data unsafe.Pointer, arb *C.cpArbiter) int {
+  arbiter := NewArbiter(arb)
   d := *(*CollisionHandlerData)(data)
-  return d.Handler(d.Space, LookupShape(a), LookupShape(b))
+  return d.Handler(d.Space, arbiter)
 }
+
+var uglyassshit []*CollisionHandlerData = make([]*CollisionHandlerData, 0)
 
 type Space struct {
   CPSpace    *C.cpSpace
@@ -35,7 +42,7 @@ type CollisionHandlerData struct {
   Handler  CollisionHandler
 }
 
-type CollisionHandler func(space *Space, a *Shape, b *Shape) int
+type CollisionHandler func(space *Space, arbiter *Arbiter) int
 
 type PostStepCallbackData struct {
   Space    *Space
@@ -97,7 +104,29 @@ func (s *Space) AddPostStepCallback(object interface{}, callback PostStepCallbac
 
 func (s *Space) AddBeginCollisionHandler(typeA uint, typeB uint, begin CollisionHandler) {
   data := CollisionHandlerData{s, begin}
+  uglyassshit = append(uglyassshit, &data)
   C.cpgoSpaceAddBeginCollisionHandler(s.CPSpace,
+    C.cpCollisionType(typeA), C.cpCollisionType(typeB), unsafe.Pointer(&data))
+}
+
+func (s *Space) AddPreSolveCollisionHandler(typeA uint, typeB uint, begin CollisionHandler) {
+  data := CollisionHandlerData{s, begin}
+  uglyassshit = append(uglyassshit, &data)
+  C.cpgoSpaceAddPreSolveCollisionHandler(s.CPSpace,
+    C.cpCollisionType(typeA), C.cpCollisionType(typeB), unsafe.Pointer(&data))
+}
+
+func (s *Space) AddPostSolveCollisionHandler(typeA uint, typeB uint, begin CollisionHandler) {
+  data := CollisionHandlerData{s, begin}
+  uglyassshit = append(uglyassshit, &data)
+  C.cpgoSpaceAddPostSolveCollisionHandler(s.CPSpace,
+    C.cpCollisionType(typeA), C.cpCollisionType(typeB), unsafe.Pointer(&data))
+}
+
+func (s *Space) AddSeparateCollisionHandler(typeA uint, typeB uint, begin CollisionHandler) {
+  data := CollisionHandlerData{s, begin}
+  uglyassshit = append(uglyassshit, &data)
+  C.cpgoSpaceAddSeparateCollisionHandler(s.CPSpace,
     C.cpCollisionType(typeA), C.cpCollisionType(typeB), unsafe.Pointer(&data))
 }
 

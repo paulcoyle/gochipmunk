@@ -13,18 +13,25 @@ type Shape struct {
   CPShape *C.cpShape
 }
 
-func NewSegmentShape(body *Body, a Vect, b Vect, radius float64) *Shape {
-  var cpshape *C.cpShape = C.cpSegmentShapeNew(body.CPBody, a.CPVect, b.CPVect, C.cpFloat(radius))
+func createAndRegister(cpshape *C.cpShape) *Shape {
   shape := Shape{cpshape} 
   shapeLookup[cpshape] = &shape
   return &shape
 }
 
+func NewSegmentShape(body *Body, a Vect, b Vect, radius float64) *Shape {
+  var cpshape *C.cpShape = C.cpSegmentShapeNew(body.CPBody, a.CPVect, b.CPVect, C.cpFloat(radius))
+  return createAndRegister(cpshape)
+}
+
 func NewCircleShape(body *Body, radius float64, offset Vect) *Shape {
   var cpshape *C.cpShape = C.cpCircleShapeNew(body.CPBody, C.cpFloat(radius), offset.CPVect)
-  shape := Shape{cpshape} 
-  shapeLookup[cpshape] = &shape
-  return &shape
+  return createAndRegister(cpshape)
+}
+
+func NewBoxShape(body *Body, width float64, height float64) *Shape {
+  var cpshape *C.cpShape = C.cpBoxShapeNew(body.CPBody, C.cpFloat(width), C.cpFloat(height))
+  return createAndRegister(cpshape)
 }
 
 func LookupShape(cpshape *C.cpShape) *Shape {

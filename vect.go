@@ -6,6 +6,7 @@ package cp
 #include <chipmunk/chipmunk.h>
 */
 import "C"
+import "math"
 
 type Vect struct {
   CPVect C.cpVect
@@ -17,6 +18,10 @@ func NewVect(x float64, y float64) Vect {
 
 func NewZeroVect() Vect {
   return Vect{C.cpVect{0.0, 0.0}}
+}
+
+func (v *Vect) GetValues() (float64, float64) {
+  return float64(v.CPVect.x), float64(v.CPVect.y)
 }
 
 func (v *Vect) GetX() float64 {
@@ -33,6 +38,24 @@ func (v *Vect) GetY() float64 {
 
 func (v *Vect) SetY(y float64) {
   v.CPVect.y = C.cpFloat(y)
+}
+
+func (v *Vect) Shift(other Vect) Vect {
+  x, y   := v.GetValues()
+  ox, oy := other.GetValues()
+  return NewVect(x+ox, y+oy)
+}
+
+func (v *Vect) Multiply(factor float64) Vect {
+  return NewVect(v.GetX() * factor, v.GetY() * factor)
+}
+
+func (v *Vect) Normalize() Vect {
+  x, y := v.GetValues()
+  mag := math.Sqrt(x*x + y*y)
+  x = x/mag
+  y = y/mag
+  return NewVect(x, y)
 }
 
 func (v *Vect) WrapToBounds(ax float64, ay float64, bx float64, by float64) {

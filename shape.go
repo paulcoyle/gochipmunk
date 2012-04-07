@@ -48,12 +48,20 @@ func (s *Shape) SetFriction(friction float64) {
   s.CPShape.u = C.cpFloat(friction)
 }
 
+func (s *Shape) GetCollisionType() uint {
+  return uint(s.CPShape.collision_type)
+}
+
 func (s *Shape) SetCollisionType(ctype uint) {
   s.CPShape.collision_type = C.cpCollisionType(ctype)
 }
 
-func (s *Shape) GetCollisionType() uint {
-  return uint(s.CPShape.collision_type)
+func (s *Shape) GetCollisionGroup() uint {
+  return uint(s.CPShape.group)
+}
+
+func (s *Shape) SetCollisionGroup(group uint) {
+  s.CPShape.group = C.cpGroup(group)
 }
 
 func (s *Shape) GetBody() *Body {

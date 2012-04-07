@@ -50,6 +50,10 @@ func (b *Body) GetVelocity() Vect {
   return Vect{C.cpBodyGetVel(b.CPBody)}
 }
 
+func (b *Body) SetVelocity(v Vect) {
+  b.CPBody.v = v.CPVect
+}
+
 func (b *Body) SetVelocityLimit(limit float64) {
   b.CPBody.v_limit = C.cpFloat(limit)
 }

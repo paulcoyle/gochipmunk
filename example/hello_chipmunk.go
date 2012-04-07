@@ -14,14 +14,14 @@ import (
 
 // Runs once at the end of a step when added to a space with
 // space.AddPostStepCallback(object interface{}, callback PostStepCallback)
-func postStep(space *cp.Space, object interface{}) {
+func postStep(space *cp.Space, data interface{}) {
   fmt.Println("POST-STEP CALLBACK")
-  shape, ok := object.(*cp.Shape)
+  shape, ok := data.(*cp.Shape)
   if ok {
     space.RemoveBody(shape.GetBody())
     space.RemoveShape(shape)
   } else {
-    fmt.Print("Couldn't resolve object into cp.Shape\n")
+    fmt.Print("Couldn't resolve data into cp.Shape\n")
   }
 }
 
@@ -29,11 +29,12 @@ func postStep(space *cp.Space, object interface{}) {
 // of these per categorical pair of collision types.  That is:
 //    (a,b) == (b,a)
 // where a and b are collision types.
-func beginCollide(space *cp.Space, arb *cp.Arbiter) int {
+func beginCollide(space *cp.Space, arb *cp.Arbiter, data interface{}) int {
   fmt.Println("BEGIN COLLISION")
   
-  // Uncomment to add a post step callback to remove the ball
-  //space.AddPostStepCallback(b, postStep)
+  // Uncomment the following to add a post step callback to remove the ball:
+  //_, ball := arb.GetShapes()
+  //space.AddPostStepCallback(ball, postStep)
   
   // Change return value to 0 to skip the collision chain
   return 1
@@ -66,7 +67,7 @@ func main() {
   ballShape.SetCollisionType(BALL)
   space.AddShape(ballShape)
   
-  space.AddBeginCollisionHandler(SEGM, BALL, beginCollide)
+  space.AddBeginCollisionHandler(SEGM, BALL, nil, beginCollide)
   
   var start int64 = time.Now().UnixNano()
   var dt float64 = 1.0/60.0

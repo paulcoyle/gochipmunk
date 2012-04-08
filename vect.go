@@ -16,6 +16,10 @@ func NewVect(x float64, y float64) Vect {
   return Vect{C.cpVect{C.cpFloat(x), C.cpFloat(y)}}
 }
 
+func NewVectFromCPVect(v C.cpVect) Vect {
+  return Vect{v}
+}
+
 func NewZeroVect() Vect {
   return Vect{C.cpVect{0.0, 0.0}}
 }
@@ -50,12 +54,18 @@ func (v *Vect) Multiply(factor float64) Vect {
   return NewVect(v.GetX() * factor, v.GetY() * factor)
 }
 
-func (v *Vect) Normalize() Vect {
+func (v *Vect) Magnitude() float64 {
   x, y := v.GetValues()
-  mag := math.Sqrt(x*x + y*y)
-  x = x/mag
-  y = y/mag
-  return NewVect(x, y)
+  return math.Sqrt(x*x + y*y)
+}
+
+func (v *Vect) Normalize() Vect {
+  mag := v.Magnitude()
+  return NewVect(v.GetX()/mag, v.GetY()/mag)
+}
+
+func (v *Vect) Angle() float64 {
+  return math.Atan2(v.GetY(), v.GetX())
 }
 
 func (v *Vect) WrapToBounds(ax float64, ay float64, bx float64, by float64) {

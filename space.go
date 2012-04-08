@@ -70,6 +70,14 @@ func (s *Space) StaticBody() *Body {
   return s.staticBody
 }
 
+func (s *Space) GetIterations() int {
+  return int(s.CPSpace.iterations)
+}
+
+func (s *Space) SetIterations(iter int) {
+  s.CPSpace.iterations = C.int(iter)
+}
+
 func (s *Space) SetGravity(v Vect) {
   s.CPSpace.gravity = v.CPVect
 }

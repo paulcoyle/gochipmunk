@@ -11,6 +11,12 @@ type Arbiter struct {
   CPArbiter *C.cpArbiter
 }
 
+type ContactPoint struct {
+  Point    Vect
+  Normal   Vect
+  Distance float64
+}
+
 func NewArbiter(cparb *C.cpArbiter) *Arbiter {
   arbiter := Arbiter{cparb}
   return &arbiter
@@ -34,4 +40,20 @@ func (a *Arbiter) TotalImpulse() Vect {
 
 func (a *Arbiter) TotalImpulseWithFriction() Vect {
   return Vect{C.cpArbiterTotalImpulseWithFriction(a.CPArbiter)}
+}
+
+func (a *Arbiter) TotalKineticEnergy() float64 {
+  return float64(C.cpArbiterTotalKE(a.CPArbiter))
+}
+
+func (a *Arbiter) GetContactPointSet() []*ContactPoint {
+  points := make([]*ContactPoint, 0)
+  rawSet := C.cpArbiterGetContactPointSet(a.CPArbiter)
+  for i := 0; i < int(rawSet.count); i++ {
+    point := ContactPoint{NewVectFromCPVect(rawSet.points[i].point),
+                          NewVectFromCPVect(rawSet.points[i].normal),
+                          float64(rawSet.points[i].dist)}
+    points = append(points, &point)
+  }
+  return points
 }

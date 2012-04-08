@@ -34,6 +34,15 @@ func NewBoxShape(body *Body, width float64, height float64) *Shape {
   return createAndRegister(cpshape)
 }
 
+func NewPolyShape(body *Body, verts []Vect, offset Vect) *Shape {
+  cpverts := make([]C.cpVect, 0)
+  for _, vert := range verts {
+    cpverts = append(cpverts, vert.CPVect)
+  }
+  var cpshape *C.cpShape = C.cpPolyShapeNew(body.CPBody, C.int(len(verts)), &cpverts[0], offset.CPVect)
+  return createAndRegister(cpshape)
+}
+
 func LookupShape(cpshape *C.cpShape) *Shape {
   return shapeLookup[cpshape]
 }
